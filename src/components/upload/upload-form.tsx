@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { toast } from "sonner"
-import { Upload, Wand2, KeyRound, Clock, Calendar } from "lucide-react"
+import { Upload, Wand2, KeyRound, Clock, Calendar, X } from "lucide-react"
 
 export type PlatformData = {
   title: string;
@@ -57,22 +57,20 @@ export function UploadDashboard() {
 
   /* PUBLISHING WORKER FUNCTIONS */
   const publishToFacebook = async () => {
-    if (!userSettings.facebookAccessToken) throw new Error("Chưa thêm Access Token Facebook trong Cài Đặt.");
     setUploadProgress(10);
+    // Route through our server-side proxy so the token stays safe in DB and CORS is bypassed
     const formData = new FormData();
-    formData.append("access_token", userSettings.facebookAccessToken);
-    formData.append("source", file!);
+    formData.append("file", file!);
     formData.append("title", platforms.facebook.title);
     formData.append("description", platforms.facebook.description);
     
     setUploadProgress(30);
-    const res = await fetch("https://graph.facebook.com/v19.0/me/videos", { method: "POST", body: formData });
+    const res = await fetch("/api/publish/facebook", { method: "POST", body: formData });
     const data = await res.json();
     setUploadProgress(100);
     
     if (!res.ok) {
-        if (data.error?.message?.includes("CORS")) throw new Error("Bị chặn CORS - Thử kết nối trực tiếp hoặc kiểm tra proxy");
-        throw new Error(data.error?.message || "Lỗi tải lên Facebook");
+        throw new Error(data.error || "Lỗi tải lên Facebook");
     }
     return data;
   }
@@ -240,6 +238,21 @@ export function UploadDashboard() {
           <Button variant="secondary" onClick={() => document.getElementById('global-file-upload')?.click()}>
             Duyệt File Trên Máy
           </Button>
+          {file && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/30"
+              onClick={() => {
+                setFile(null);
+                const input = document.getElementById('global-file-upload') as HTMLInputElement;
+                if (input) input.value = '';
+              }}
+              title="Xoá video đã chọn"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          )}
           <input 
             type="file" 
             id="global-file-upload"
