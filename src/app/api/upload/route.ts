@@ -18,8 +18,9 @@ export async function POST(request: NextRequest) {
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const filename = `${crypto.randomUUID()}-${originalName}`;
     
-    // For local development, saving to public/uploads
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    // Use /tmp which is writable on both Vercel and local environments.
+    // public/uploads is read-only on Vercel serverless.
+    const uploadDir = "/tmp/uploads";
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -27,8 +28,8 @@ export async function POST(request: NextRequest) {
     const filePath = path.join(uploadDir, filename);
     await writeFile(filePath, buffer);
     
-    // In production, this would be an S3 or R2 URL
-    const fileUrl = `/uploads/${filename}`;
+    // Return a server-internal path for the AI generate API to read from
+    const fileUrl = `/tmp/uploads/${filename}`;
 
     return NextResponse.json({ 
       message: "Success", 

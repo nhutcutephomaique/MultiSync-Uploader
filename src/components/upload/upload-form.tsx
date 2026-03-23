@@ -355,20 +355,13 @@ function PlatformForm({
     if (!apiKey) { toast.error("Vui lòng nhập Gemini AI API Key trước."); return }
     
     setIsGenerating(true)
-    toast.info(`Đang phân tích video cho ${platform}...`)
+    toast.info(`Đang gọi AI cho ${platform}...`)
     
     try {
-      const formData = new FormData()
-      formData.append("file", file)
-      
-      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData })
-      if (!uploadRes.ok) throw new Error("Lỗi khi tải video tạm lên server")
-      const { fileUrl } = await uploadRes.json()
-
       const aiRes = await fetch("/api/ai/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileUrl, apiKey, platform })
+        body: JSON.stringify({ apiKey, platform })
       })
       
       if (!aiRes.ok) {
