@@ -12,6 +12,7 @@ import { KeyRound, Link2, CheckCircle2, Save, Loader2 } from "lucide-react"
 export default function SettingsPage() {
   const [geminiKey, setGeminiKey] = useState("")
   const [fbToken, setFbToken] = useState("")
+  const [fbPageId, setFbPageId] = useState("")
   const [ytToken, setYtToken] = useState("")
   const [ttToken, setTtToken] = useState("")
   const [isLoading, setIsLoading] = useState(true)
@@ -25,6 +26,7 @@ export default function SettingsPage() {
         if (data && !data.error) {
           setGeminiKey(data.geminiApiKey || "")
           setFbToken(data.facebookAccessToken || "")
+          setFbPageId(data.facebookPageId || "")
           setYtToken(data.youtubeRefreshToken || "")
           setTtToken(data.tiktokAccessToken || "")
         }
@@ -45,6 +47,7 @@ export default function SettingsPage() {
         body: JSON.stringify({
           geminiApiKey: geminiKey,
           facebookAccessToken: fbToken,
+          facebookPageId: fbPageId,
           youtubeRefreshToken: ytToken,
           tiktokAccessToken: ttToken,
         })
@@ -118,17 +121,25 @@ export default function SettingsPage() {
         </h3>
         <p className="text-sm text-neutral-400">Điền Token định danh cá nhân để cấp quyền đăng video tự động lên tài khoản của bạn.</p>
 
-        {/* Facebook */}
         <Card className="bg-neutral-900/60 border-neutral-800">
-          <CardContent className="py-5 flex sm:flex-row flex-col gap-4 justify-between items-start sm:items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center font-bold text-white">f</div>
-              <div>
-                <p className="font-medium">Facebook Page Access Token</p>
-                <p className="text-xs text-neutral-400">Dùng để đăng Reels và bài viết lên Fanpage cá nhân của bạn</p>
+          <CardContent className="py-5 space-y-3">
+            <div className="flex sm:flex-row flex-col gap-4 justify-between items-start sm:items-center">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center font-bold text-white">f</div>
+                <div>
+                  <p className="font-medium">Facebook Page Access Token</p>
+                  <p className="text-xs text-neutral-400">Cần scope: <code className="text-blue-300">pages_manage_posts, video_manage</code></p>
+                </div>
               </div>
+              <Input type="password" placeholder="EAAB..." value={fbToken} onChange={e => setFbToken(e.target.value)} className="bg-neutral-950 border-neutral-700 w-full sm:w-64 font-mono text-xs" />
             </div>
-            <Input type="password" placeholder="EAAB..." value={fbToken} onChange={e => setFbToken(e.target.value)} className="bg-neutral-950 border-neutral-700 w-full sm:w-64 font-mono text-xs" />
+            <div className="flex sm:flex-row flex-col gap-4 justify-between items-start sm:items-center pl-13">
+              <div className="pl-13 text-sm text-neutral-400 flex items-center gap-2">
+                <span className="text-yellow-400 font-mono text-xs">PAGE ID</span>
+                <span className="text-xs">ID trang Facebook (bắt buộc nếu bạn dùng Fanpage)</span>
+              </div>
+              <Input type="text" placeholder="123456789012345" value={fbPageId} onChange={e => setFbPageId(e.target.value)} className="bg-neutral-950 border-neutral-700 w-full sm:w-64 font-mono text-xs" />
+            </div>
           </CardContent>
         </Card>
 

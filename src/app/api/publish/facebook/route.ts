@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { facebookAccessToken: true }
+      select: { facebookAccessToken: true, facebookPageId: true }
     });
 
     if (!user?.facebookAccessToken) {
@@ -33,7 +33,9 @@ export async function POST(req: NextRequest) {
     fbFormData.append("description", description);
     fbFormData.append("access_token", user.facebookAccessToken);
 
-    const fbRes = await fetch("https://graph.facebook.com/v19.0/me/videos", {
+    // Use Page-specific endpoint if the user configured a Page ID, otherwise use personal profile
+    const fbEndpointId = user.facebookPageId ? user.facebookPageId : "me";
+    const fbRes = await fetch(`https://graph.facebook.com/v19.0/${fbEndpointId}/videos`, {
       method: "POST",
       body: fbFormData,
     });

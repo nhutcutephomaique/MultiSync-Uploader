@@ -19,6 +19,7 @@ model User {
   videos              Video[]
   geminiApiKey        String?
   facebookAccessToken String?
+  facebookPageId      String?
   youtubeRefreshToken String?
   tiktokAccessToken   String?
 }
