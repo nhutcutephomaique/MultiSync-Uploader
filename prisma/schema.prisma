@@ -15,9 +15,12 @@ model User {
   emailVerified DateTime?
   image         String?
   accounts      Account[]
-  sessions      Session[]
-  videos        Video[]
-  geminiApiKey  String?
+  sessions            Session[]
+  videos              Video[]
+  geminiApiKey        String?
+  facebookAccessToken String?
+  youtubeRefreshToken String?
+  tiktokAccessToken   String?
 }
 
 model Account {
