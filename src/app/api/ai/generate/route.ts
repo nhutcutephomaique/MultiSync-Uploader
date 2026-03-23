@@ -31,7 +31,17 @@ Trả lời DUY NHẤT một chuỗi nội dung JSON (không kèm chuỗi markdo
 
     if (!response.ok) {
       const err = await response.json();
-      return NextResponse.json({ error: err.error?.message || "Lỗi từ Gemini API" }, { status: 500 });
+      const errMsg = err.error?.message || "Lỗi từ Gemini API";
+      // Provide clearer Vietnamese message for quota exceeded
+      if (errMsg.includes("quota") || errMsg.includes("Quota") || response.status === 429) {
+        return NextResponse.json({
+          error: "⚠️ API Key Gemini của bạn đã hết hạn mức miễn phí hôm nay. Vui lòng chờ reset lúc 7:00 sáng (giờ VN) hoặc tạo API Key mới tại aistudio.google.com"
+        }, { status: 429 });
+      }
+      if (errMsg.includes("API_KEY_INVALID") || errMsg.includes("invalid")) {
+        return NextResponse.json({ error: "❌ API Key Gemini không hợp lệ. Vui lòng kiểm tra lại key trong phần Cài Đặt." }, { status: 401 });
+      }
+      return NextResponse.json({ error: errMsg }, { status: 500 });
     }
 
     const data = await response.json();
