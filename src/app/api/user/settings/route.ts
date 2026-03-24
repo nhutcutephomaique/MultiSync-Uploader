@@ -39,14 +39,20 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { geminiApiKey, facebookAccessToken, facebookPageId, youtubeRefreshToken, tiktokAccessToken } = body;
 
-    const user = await prisma.user.update({
+    const userData = {
+      geminiApiKey: geminiApiKey || null,
+      facebookAccessToken: facebookAccessToken || null,
+      facebookPageId: facebookPageId || null,
+      youtubeRefreshToken: youtubeRefreshToken || null,
+      tiktokAccessToken: tiktokAccessToken || null,
+    };
+
+    await prisma.user.upsert({
       where: { email: session.user.email },
-      data: {
-        geminiApiKey: geminiApiKey || null,
-        facebookAccessToken: facebookAccessToken || null,
-        facebookPageId: facebookPageId || null,
-        youtubeRefreshToken: youtubeRefreshToken || null,
-        tiktokAccessToken: tiktokAccessToken || null,
+      update: userData,
+      create: {
+        email: session.user.email,
+        ...userData,
       },
     });
 
