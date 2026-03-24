@@ -38,33 +38,42 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async signIn({ user }) {
       if (!user.email) return false
-      await prisma.user.upsert({
-        where: { email: user.email },
-        update: {
-          name: user.name ?? undefined,
-          image: user.image ?? undefined,
-        },
-        create: {
-          email: user.email,
-          name: user.name,
-          image: user.image,
-        },
-      })
+      try {
+        await prisma.user.upsert({
+          where: { email: user.email },
+          update: {
+            name: user.name ?? undefined,
+            image: user.image ?? undefined,
+          },
+          create: {
+            email: user.email,
+            name: user.name,
+            image: user.image,
+          },
+        })
+      } catch (err) {
+        // Don't block login if DB is temporarily unavailable
+        console.error("[auth] signIn DB error (non-fatal):", err)
+      }
       return true
     },
     async jwt({ token, user }) {
       if (user?.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email },
-          select: { id: true },
-        })
-        if (dbUser?.id) (token as { uid?: string }).uid = dbUser.id
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: user.email },
+            select: { id: true },
+          })
+          if (dbUser?.id) (token as { uid?: string }).uid = dbUser.id
+        } catch {}
       } else if (!(token as { uid?: string }).uid && token.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: token.email },
-          select: { id: true },
-        })
-        if (dbUser?.id) (token as { uid?: string }).uid = dbUser.id
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: token.email },
+            select: { id: true },
+          })
+          if (dbUser?.id) (token as { uid?: string }).uid = dbUser.id
+        } catch {}
       }
       return token
     },
@@ -78,5 +87,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
 })
