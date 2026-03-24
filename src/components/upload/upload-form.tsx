@@ -280,28 +280,6 @@ export function UploadDashboard() {
         </div>
       )}
 
-      {/* Global AI API Key Setting */}
-      <Card className="bg-neutral-900/60 border-neutral-800 backdrop-blur">
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-             <div className="flex-1 w-full">
-                 <Label htmlFor="master-api-key" className="flex items-center gap-2 text-indigo-400 font-semibold mb-3">
-                   <KeyRound className="w-5 h-5" /> 
-                   Gemini AI API Key (Key Dùng Chung)
-                 </Label>
-                 <Input 
-                    id="master-api-key"
-                    type="password" 
-                    placeholder="Nhập khóa định danh AIza... ở đây hoặc trong Cài đặt" 
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    className="bg-neutral-950 border-neutral-700 w-full"
-                  />
-             </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Tabs */}
       <Tabs defaultValue="facebook" className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-neutral-900 border border-neutral-800 p-1 h-12 rounded-xl">
