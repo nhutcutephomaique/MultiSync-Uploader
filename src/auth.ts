@@ -15,7 +15,7 @@ const authSecret =
 // Google is the ONLY login provider.
 // Facebook / TikTok / YouTube are linked separately in settings for publishing.
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  // Avoid host validation false positives in local/dev environments.
+  // trustHost: true is required for Vercel deployments to avoid CSRF host errors.
   trustHost: true,
   secret: authSecret,
   session: {
